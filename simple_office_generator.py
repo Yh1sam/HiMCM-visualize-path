@@ -1,12 +1,36 @@
 import json
 import math
+import random
+
+def add_people_to_layout(layout, num_people):
+    """Adds a number of people to random offices in the layout."""
+    offices = [r for r in layout['rooms'] if r['type'] == 'office']
+    if not offices:
+        return
+
+    for i in range(num_people):
+        person_id = f"PERSON_{i+1}"
+        room = random.choice(offices)
+        
+        # Place person randomly within the room
+        room_x, room_y = room['position']
+        room_w, room_h = room['size']
+        pos_x = random.uniform(room_x + 1, room_x + room_w - 1)
+        pos_y = random.uniform(room_y + 1, room_y + room_h - 1)
+
+        layout['people'].append({
+            'id': person_id,
+            'start_room': room['id'],
+            'position': (pos_x, pos_y)
+        })
 
 def generate_simple_office_layout(
     floor_width=50.0,
     floor_height=30.0,
     corridor_width=3.0,
     num_offices_per_side=5,
-    door_width = 0.9
+    door_width = 2,
+    num_people=5
 ):
     """
     Generates a simple, well-structured office layout from scratch.
@@ -22,10 +46,11 @@ def generate_simple_office_layout(
     3.  A door is added to each office, connecting it to the corridor.
     4.  Two exits are placed at each end of the central corridor.
     5.  Safety equipment is distributed logically.
+    6.  A specified number of people are randomly placed in offices.
 
     Returns:
         dict: A dictionary containing the building's name, floor dimensions,
-              and lists of rooms, doors, exits, and safety equipment.
+              and lists of rooms, doors, exits, safety equipment, and people.
     """
     layout = {
         'name': 'Simple Office Floor',
@@ -33,7 +58,8 @@ def generate_simple_office_layout(
         'rooms': [],
         'doors': [],
         'exits': [],
-        'safety_equipment': []
+        'safety_equipment': [],
+        'people': []
     }
 
     # Add central corridor
@@ -68,7 +94,7 @@ def generate_simple_office_layout(
             'id': f'DOOR_OFFICE_{room_id}',
             'room_id': f'OFFICE_{room_id}',
             'position': (office_x + (office_w - door_width)/2, office_y),
-            'size': (door_width, 0.2) # thin rectangle for door
+            'size': (door_width, 0.5) # thin rectangle for door
         })
         room_id += 1
 
@@ -88,7 +114,7 @@ def generate_simple_office_layout(
         layout['doors'].append({
             'id': f'DOOR_OFFICE_{room_id}',
             'room_id': f'OFFICE_{room_id}',
-            'position': (office_x + (office_w - door_width)/2, office_h - 0.2),
+            'position': (office_x + (office_w - door_width)/2, office_h-0.05),
             'size': (door_width, 0.2) # thin rectangle for door
         })
         room_id += 1
@@ -149,7 +175,7 @@ def generate_simple_office_layout(
                     'position': (i * 10, ry + rh/2)
                 })
 
-
+    add_people_to_layout(layout, num_people)
     return layout
 
 if __name__ == "__main__":

@@ -154,120 +154,120 @@
       "id": "DOOR_OFFICE_0",
       "room_id": "OFFICE_0",
       "position": [
-        4.55,
-        16.5
+        4.0,
+        15.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_1",
       "room_id": "OFFICE_1",
       "position": [
-        4.55,
-        13.3
+        4.0,
+        12.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_2",
       "room_id": "OFFICE_2",
       "position": [
-        14.55,
-        16.5
+        14.0,
+        15.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_3",
       "room_id": "OFFICE_3",
       "position": [
-        14.55,
-        13.3
+        14.0,
+        12.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_4",
       "room_id": "OFFICE_4",
       "position": [
-        24.55,
-        16.5
+        24.0,
+        15.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_5",
       "room_id": "OFFICE_5",
       "position": [
-        24.55,
-        13.3
+        24.0,
+        12.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_6",
       "room_id": "OFFICE_6",
       "position": [
-        34.55,
-        16.5
+        34.0,
+        15.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_7",
       "room_id": "OFFICE_7",
       "position": [
-        34.55,
-        13.3
+        34.0,
+        12.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_8",
       "room_id": "OFFICE_8",
       "position": [
-        44.55,
-        16.5
+        44.0,
+        15.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     },
     {
       "id": "DOOR_OFFICE_9",
       "room_id": "OFFICE_9",
       "position": [
-        44.55,
-        13.3
+        44.0,
+        12.75
       ],
       "size": [
-        0.9,
-        0.2
+        2.0,
+        1.5
       ]
     }
   ],
@@ -450,6 +450,48 @@
       "position": [
         45.0,
         6.75
+      ]
+    }
+  ],
+  "people": [
+    {
+      "id": "PERSON_1",
+      "start_room": "OFFICE_4",
+      "position": [
+        28.18812745996054,
+        18.239166114025796
+      ]
+    },
+    {
+      "id": "PERSON_2",
+      "start_room": "OFFICE_3",
+      "position": [
+        15.80883579033194,
+        6.855346802593669
+      ]
+    },
+    {
+      "id": "PERSON_3",
+      "start_room": "OFFICE_9",
+      "position": [
+        46.45922988141386,
+        1.1171800880366125
+      ]
+    },
+    {
+      "id": "PERSON_4",
+      "start_room": "OFFICE_2",
+      "position": [
+        17.486713509712583,
+        27.704534712171608
+      ]
+    },
+    {
+      "id": "PERSON_5",
+      "start_room": "OFFICE_7",
+      "position": [
+        38.898838353614146,
+        9.514930022257008
       ]
     }
   ]

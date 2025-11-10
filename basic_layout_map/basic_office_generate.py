@@ -223,7 +223,7 @@ def save_exit_positions(exits, resolution, output_dir):
 # ===== MAIN PROGRAM =====
 if __name__ == "__main__":
     # Create output directory
-    output_dir = 'office_layouts'
+    output_dir = 'basic_office_layouts'
     os.makedirs(output_dir, exist_ok=True)
     
     # Add timestamp subdirectory for version control

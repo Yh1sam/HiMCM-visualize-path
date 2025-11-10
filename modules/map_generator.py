@@ -1,9 +1,11 @@
-# room_generator.py - 生成房間布局和通行圖
+# room_generator.py - Generate room layout and walkability map with folder management
 import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
+import os
+from datetime import datetime
 
 class Room:
     def __init__(self, x, y, width, height):
@@ -11,7 +13,7 @@ class Room:
         self.y = y
         self.width = width
         self.height = height
-        self.type = random.choice(['客廳', '臥室', '廚房', '浴室', '書房', '餐廳', '儲藏室'])
+        self.type = random.choice(['Living Room', 'Bedroom', 'Kitchen', 'Bathroom', 'Study', 'Dining Room', 'Storage'])
         self.color = random.choice(['#FFE5B4', '#B4D7FF', '#FFB4D7', '#B4FFD7', 
                                    '#FFD7B4', '#D7B4FF', '#FFFFB4'])
         self.doors = []
@@ -21,7 +23,7 @@ class Room:
         return self.width * self.height
     
     def is_adjacent(self, other):
-        """檢查兩個房間是否相鄰"""
+        """Check if two rooms are adjacent"""
         epsilon = 0.01
         
         if abs(self.x + self.width - other.x) < epsilon or \
@@ -35,7 +37,7 @@ class Room:
         return False
     
     def create_door_to(self, other):
-        """在兩個相鄰房間之間創建門"""
+        """Create door between adjacent rooms"""
         door_width = 1
         door = None
 
@@ -45,9 +47,9 @@ class Room:
             overlap_mid = (overlap_start + overlap_end) / 2
             
             door = {
-                'x': self.x + self.width - 0.1,
+                'x': self.x + self.width - 0.2,
                 'y': overlap_mid - door_width / 2,
-                'width': 0.2,
+                'width': 0.4,  # Increased door depth for wall penetration
                 'height': door_width,
                 'is_exit': False
             }
@@ -57,9 +59,9 @@ class Room:
             overlap_mid = (overlap_start + overlap_end) / 2
             
             door = {
-                'x': self.x - 0.1,
+                'x': self.x - 0.2,
                 'y': overlap_mid - door_width / 2,
-                'width': 0.2,
+                'width': 0.4,  # Increased door depth
                 'height': door_width,
                 'is_exit': False
             }
@@ -70,9 +72,9 @@ class Room:
             
             door = {
                 'x': overlap_mid - door_width / 2,
-                'y': self.y + self.height - 0.1,
+                'y': self.y + self.height - 0.2,
                 'width': door_width,
-                'height': 0.2,
+                'height': 0.4,  # Increased door depth
                 'is_exit': False
             }
         elif abs(other.y + other.height - self.y) < 0.01:
@@ -82,9 +84,9 @@ class Room:
             
             door = {
                 'x': overlap_mid - door_width / 2,
-                'y': self.y - 0.1,
+                'y': self.y - 0.2,
                 'width': door_width,
-                'height': 0.2,
+                'height': 0.4,  # Increased door depth
                 'is_exit': False
             }
 
@@ -93,7 +95,7 @@ class Room:
             self.connected_to.add(id(other))
     
     def create_exit(self, width_total, height_total):
-        """創建外部出口"""
+        """Create external exit"""
         door_width = 1
         walls = []
         
@@ -115,32 +117,32 @@ class Room:
         if wall == 'top':
             exit_door = {
                 'x': self.x + (self.width - door_width) / 2,
-                'y': self.y - 0.1,
+                'y': self.y - 0.2,
                 'width': door_width,
-                'height': 0.2,
+                'height': 0.4,  # Increased exit depth
                 'is_exit': True
             }
         elif wall == 'right':
             exit_door = {
-                'x': self.x + self.width - 0.1,
+                'x': self.x + self.width - 0.2,
                 'y': self.y + (self.height - door_width) / 2,
-                'width': 0.2,
+                'width': 0.4,  # Increased exit depth
                 'height': door_width,
                 'is_exit': True
             }
         elif wall == 'bottom':
             exit_door = {
                 'x': self.x + (self.width - door_width) / 2,
-                'y': self.y + self.height - 0.1,
+                'y': self.y + self.height - 0.2,
                 'width': door_width,
-                'height': 0.2,
+                'height': 0.4,  # Increased exit depth
                 'is_exit': True
             }
         elif wall == 'left':
             exit_door = {
-                'x': self.x - 0.1,
+                'x': self.x - 0.2,
                 'y': self.y + (self.height - door_width) / 2,
-                'width': 0.2,
+                'width': 0.4,  # Increased exit depth
                 'height': door_width,
                 'is_exit': True
             }
@@ -153,7 +155,7 @@ class Room:
 rooms = []
 
 def split_space(x, y, width, height, depth, max_depth, min_size):
-    """使用BSP算法遞迴分割空間"""
+    """Recursively split space using Binary Space Partitioning algorithm"""
     if depth >= max_depth or width < min_size * 2 or height < min_size * 2:
         rooms.append(Room(x, y, width, height))
         return
@@ -172,7 +174,7 @@ def split_space(x, y, width, height, depth, max_depth, min_size):
         rooms.append(Room(x, y, width, height))
 
 def ensure_connectivity():
-    """確保所有房間連通（使用最小生成樹思想）"""
+    """Ensure all rooms are connected using minimum spanning tree concept"""
     if len(rooms) <= 1:
         return
     
@@ -204,16 +206,16 @@ def ensure_connectivity():
             break
 
 def create_walkability_map(width, height, resolution):
-    """創建通行圖：0=可行走，1=牆壁"""
+    """Create walkability map: 0=walkable, 1=wall"""
     width_px = int(width * resolution)
     height_px = int(height * resolution)
     
-    # 創建網格（初始為1 - 全是牆壁）
+    # Initialize grid as all walls (1)
     grid = np.ones((width_px, height_px), dtype=np.uint8)
     
     wall_thickness = int(0.1 * resolution)
     
-    # 繪製每個房間的可行走區域（0）
+    # Draw walkable areas for each room (0)
     for room in rooms:
         x1 = int(room.x * resolution) + wall_thickness
         y1 = int(room.y * resolution) + wall_thickness
@@ -222,7 +224,7 @@ def create_walkability_map(width, height, resolution):
         
         grid[x1:x2, y1:y2] = 0
     
-    # 繪製門口（0 - 可行走）
+    # Draw doors (0 - walkable)
     for room in rooms:
         for door in room.doors:
             x1 = max(0, int(door['x'] * resolution))
@@ -234,8 +236,8 @@ def create_walkability_map(width, height, resolution):
     
     return grid
 
-def save_exit_positions(width, height, resolution, filename='exit_positions.npy'):
-    """保存所有出口位置"""
+def save_exit_positions(width, height, resolution, output_dir):
+    """Save all exit positions"""
     exits = []
     for room in rooms:
         for door in room.doors:
@@ -245,24 +247,37 @@ def save_exit_positions(width, height, resolution, filename='exit_positions.npy'
                 exits.append([center_x, center_y])
     
     if exits:
-        np.save(filename, np.array(exits))
-        print(f"出口位置已保存到 {filename}")
+        filepath = os.path.join(output_dir, 'exit_positions.npy')
+        np.save(filepath, np.array(exits))
+        print(f"Exit positions saved to {filepath}")
     return exits
 
-# ===== 主程序 =====
+# ===== MAIN PROGRAM =====
 if __name__ == "__main__":
-    # 參數設置
+    # Create layouts main directory
+    layouts_dir = 'layouts'
+    os.makedirs(layouts_dir, exist_ok=True)
+    
+    # Create timestamped subdirectory
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_dir = os.path.join(layouts_dir, timestamp)
+    os.makedirs(output_dir, exist_ok=True)
+    
+    print(f"Creating new layout directory: {output_dir}")
+    print("="*60)
+    
+    # Parameter settings
     WIDTH = 20
     HEIGHT = 15
     MIN_SIZE = 3
     SPLITS = 4
     RESOLUTION = 50
 
-    print("生成房間布局...")
+    print("Generating room layout...")
     split_space(0, 0, WIDTH, HEIGHT, 0, SPLITS, MIN_SIZE)
     ensure_connectivity()
 
-    # 創建1-2個外部出口
+    # Create 1-2 external exits
     exit_count = 1 if random.random() < 0.5 else 2
     boundary_rooms = [r for r in rooms if 
                       r.x == 0 or r.y == 0 or 
@@ -277,32 +292,36 @@ if __name__ == "__main__":
         if room.create_exit(WIDTH, HEIGHT):
             exits_created += 1
 
-    print(f"生成了 {len(rooms)} 個房間，{exits_created} 個出口")
+    print(f"Generated {len(rooms)} rooms with {exits_created} exits")
 
-    # 生成並保存通行圖
-    print("生成通行圖...")
+    # Generate and save walkability map
+    print("Generating walkability map...")
     walkability_grid = create_walkability_map(WIDTH, HEIGHT, RESOLUTION)
     
-    # 保存為numpy數組
-    np.save('walkability_map.npy', walkability_grid)
-    print("通行圖已保存為 walkability_map.npy")
+    # Save as numpy array
+    walkmap_path = os.path.join(output_dir, 'walkability_map.npy')
+    np.save(walkmap_path, walkability_grid)
+    print(f"Walkability map saved to {walkmap_path}")
     
-    # 保存出口位置
-    exits = save_exit_positions(WIDTH, HEIGHT, RESOLUTION)
+    # Save exit positions
+    exits = save_exit_positions(WIDTH, HEIGHT, RESOLUTION, output_dir)
     
-    # 保存配置參數
+    # Save configuration parameters
     config = {
         'width': WIDTH,
         'height': HEIGHT,
         'resolution': RESOLUTION,
         'num_rooms': len(rooms),
-        'num_exits': exits_created
+        'num_exits': exits_created,
+        'door_depth': '0.4m (increased for wall penetration)',
+        'timestamp': timestamp
     }
-    np.save('layout_config.npy', config)
-    print("配置已保存為 layout_config.npy")
+    config_path = os.path.join(output_dir, 'layout_config.npy')
+    np.save(config_path, config)
+    print(f"Configuration saved to {config_path}")
 
-    # 可視化彩色房間布局
-    print("繪製布局圖...")
+    # Visualize colored room layout
+    print("Rendering layout diagram...")
     fig, ax = plt.subplots(figsize=(14, 10))
 
     for room in rooms:
@@ -328,14 +347,80 @@ if __name__ == "__main__":
     ax.set_xlim(0, WIDTH)
     ax.set_ylim(0, HEIGHT)
     ax.set_aspect('equal')
-    ax.set_xlabel('寬度 (m)', fontsize=12)
-    ax.set_ylabel('高度 (m)', fontsize=12)
-    ax.set_title('2D室內空間布局圖（最小連通）', fontsize=14, weight='bold')
+    ax.set_xlabel('Width (m)', fontsize=12, weight='bold')
+    ax.set_ylabel('Height (m)', fontsize=12, weight='bold')
+    ax.set_title(f'2D Indoor Space Layout - {timestamp}', fontsize=14, weight='bold')
     ax.grid(True, alpha=0.3, linestyle='--')
 
     plt.tight_layout()
-    plt.savefig('room_layout.png', dpi=150, bbox_inches='tight')
-    print("布局圖已保存為 room_layout.png")
+    layout_path = os.path.join(output_dir, 'room_layout.png')
+    plt.savefig(layout_path, dpi=150, bbox_inches='tight')
+    print(f"Layout diagram saved to {layout_path}")
+    plt.show()
+    
+    # Create and save walkability map visualization (black/white + green exits)
+    print("Generating walkability map visualization...")
+    fig, ax = plt.subplots(figsize=(14, 10))
+    
+    # Create RGB image
+    height_px = walkability_grid.shape[1]
+    width_px = walkability_grid.shape[0]
+    walkmap_visual = np.zeros((height_px, width_px, 3), dtype=np.uint8)
+    
+    # Fill colors
+    for i in range(width_px):
+        for j in range(height_px):
+            if walkability_grid[i][j] == 0:
+                walkmap_visual[j][i] = [255, 255, 255]  # White = walkable
+            else:
+                walkmap_visual[j][i] = [0, 0, 0]        # Black = wall
+    
+    # Mark exits as green
+    for room in rooms:
+        for door in room.doors:
+            if door.get('is_exit', False):
+                x1 = max(0, int(door['x'] * RESOLUTION))
+                y1 = max(0, int(door['y'] * RESOLUTION))
+                x2 = min(width_px, int((door['x'] + door['width']) * RESOLUTION))
+                y2 = min(height_px, int((door['y'] + door['height']) * RESOLUTION))
+                
+                for i in range(x1, x2):
+                    for j in range(y1, y2):
+                        if i < width_px and j < height_px:
+                            walkmap_visual[j][i] = [0, 255, 0]  # Green = exit
+    
+    ax.imshow(walkmap_visual, origin='lower', extent=[0, WIDTH, 0, HEIGHT])
+    ax.set_xlim(0, WIDTH)
+    ax.set_ylim(0, HEIGHT)
+    ax.set_aspect('equal')
+    ax.set_xlabel('Width (m)', fontsize=12, weight='bold')
+    ax.set_ylabel('Height (m)', fontsize=12, weight='bold')
+    ax.set_title(f'Walkability Map (White=Walkable, Black=Wall, Green=Exit) - {timestamp}', 
+                fontsize=14, weight='bold')
+    ax.grid(True, alpha=0.3, linestyle='--', color='gray')
+    
+    plt.tight_layout()
+    walkmap_visual_path = os.path.join(output_dir, 'walkability_map.png')
+    plt.savefig(walkmap_visual_path, dpi=150, bbox_inches='tight')
+    print(f"Walkability map visualization saved to {walkmap_visual_path}")
     plt.show()
 
-    print("\n完成！可以運行 pathfinding.py 進行尋路演算")
+    # Create latest link (or text file)
+    latest_file = os.path.join(layouts_dir, 'latest.txt')
+    with open(latest_file, 'w') as f:
+        f.write(timestamp)
+    print(f"Latest layout record saved to {latest_file}")
+
+    print(f"\n{'='*60}")
+    print("Generation complete!")
+    print(f"\nAll files saved to: {output_dir}")
+    print(f"Files created:")
+    print(f"  - room_layout.png (colored layout diagram)")
+    print(f"  - walkability_map.png (black/white walkability map + green exits)")
+    print(f"  - walkability_map.npy (grid data)")
+    print(f"  - exit_positions.npy (exit coordinates)")
+    print(f"  - layout_config.npy (configuration info)")
+    print(f"{'='*60}")
+    print(f"\nTo use this layout for pathfinding, copy files from")
+    print(f"{output_dir}")
+    print(f"to the main directory, or modify pathfinding.py to read from this directory!")

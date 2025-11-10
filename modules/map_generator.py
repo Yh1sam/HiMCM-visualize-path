@@ -239,17 +239,25 @@ def create_walkability_map(width, height, resolution):
 def save_exit_positions(width, height, resolution, output_dir):
     """Save all exit positions"""
     exits = []
+    max_x = int(width * resolution) - 1  # Maximum valid x index
+    max_y = int(height * resolution) - 1  # Maximum valid y index
+    
     for room in rooms:
         for door in room.doors:
             if door.get('is_exit', False):
                 center_x = int((door['x'] + door['width'] / 2) * resolution)
                 center_y = int((door['y'] + door['height'] / 2) * resolution)
+                
+                # Clamp to valid grid boundaries
+                center_x = max(0, min(center_x, max_x))
+                center_y = max(0, min(center_y, max_y))
+                
                 exits.append([center_x, center_y])
     
     if exits:
         filepath = os.path.join(output_dir, 'exit_positions.npy')
         np.save(filepath, np.array(exits))
-        print(f"Exit positions saved to {filepath}")
+        print(f"Exit positions saved to {filepath}: {exits}")
     return exits
 
 # ===== MAIN PROGRAM =====

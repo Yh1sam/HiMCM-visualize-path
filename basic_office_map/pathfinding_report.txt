@@ -1,0 +1,75 @@
+======================================================================
+A* PATHFINDING SIMULATION REPORT
+======================================================================
+
+LAYOUT CONFIGURATION:
+----------------------------------------------------------------------
+Map Size: 30m × 20m
+Resolution: 50 px/meter
+Number of Rooms: 6
+Number of Exits: 2
+
+PATHFINDING RESULTS:
+----------------------------------------------------------------------
+Total People: 8
+Successful Paths: 8
+Failed Paths: 0
+Success Rate: 100.0%
+
+EXIT USAGE STATISTICS:
+----------------------------------------------------------------------
+Exit at (np.int64(0), np.int64(500)): 4 people
+Exit at (np.int64(1499), np.int64(500)): 4 people
+
+DETAILED PATH INFORMATION:
+----------------------------------------------------------------------
+
+Person 1:
+  Start Position: (585, 954)
+  Target Exit: (0, 500)
+  Path Length: 1063 steps
+  Path Status: ✓ SUCCESS
+
+Person 2:
+  Start Position: (11, 23)
+  Target Exit: (0, 500)
+  Path Length: 585 steps
+  Path Status: ✓ SUCCESS
+
+Person 3:
+  Start Position: (809, 12)
+  Target Exit: (1499, 500)
+  Path Length: 1096 steps
+  Path Status: ✓ SUCCESS
+
+Person 4:
+  Start Position: (808, 46)
+  Target Exit: (1499, 500)
+  Path Length: 1062 steps
+  Path Status: ✓ SUCCESS
+
+Person 5:
+  Start Position: (1146, 819)
+  Target Exit: (1499, 500)
+  Path Length: 428 steps
+  Path Status: ✓ SUCCESS
+
+Person 6:
+  Start Position: (345, 792)
+  Target Exit: (0, 500)
+  Path Length: 401 steps
+  Path Status: ✓ SUCCESS
+
+Person 7:
+  Start Position: (407, 540)
+  Target Exit: (0, 500)
+  Path Length: 408 steps
+  Path Status: ✓ SUCCESS
+
+Person 8:
+  Start Position: (762, 403)
+  Target Exit: (1499, 500)
+  Path Length: 738 steps
+  Path Status: ✓ SUCCESS
+
+======================================================================

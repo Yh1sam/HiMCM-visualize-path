@@ -57,6 +57,16 @@ def is_diagonal_move_valid(grid, current, neighbor):
 
 def a_star_search(grid, start, end):
     """Returns a path as a list of tuples from start to end on the given grid."""
+    # Clamp start and end positions to valid grid boundaries
+    start = (
+        max(0, min(start[0], len(grid) - 1)),
+        max(0, min(start[1], len(grid[0]) - 1))
+    )
+    end = (
+        max(0, min(end[0], len(grid) - 1)),
+        max(0, min(end[1], len(grid[0]) - 1))
+    )
+    
     if grid[start[0]][start[1]] != 0:
         print(f"Warning: Start point {start} is not walkable, adjusting...")
         for dx in range(-5, 6):
@@ -139,11 +149,13 @@ def find_nearest_exit(person_pos, exits):
     min_dist = float('inf')
     nearest_exit = None
     for exit_pos in exits:
-        dist = math.dist(person_pos, exit_pos)
+        # Ensure exit_pos is a tuple of standard Python integers
+        exit_tuple = (int(exit_pos[0]), int(exit_pos[1]))
+        dist = math.dist(person_pos, exit_tuple)
         if dist < min_dist:
             min_dist = dist
-            nearest_exit = exit_pos
-    return tuple(nearest_exit) if nearest_exit is not None else None
+            nearest_exit = exit_tuple
+    return nearest_exit
 
 
 def find_random_walkable_positions(grid, num_people):
@@ -179,29 +191,80 @@ def load_map_data(layout_dir):
     return walkability_grid, config, exits
 
 
-def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=True):
+def save_pathfinding_report(layout_dir, results):
+    """Save pathfinding results to a text report"""
+    report_path = os.path.join(layout_dir, 'pathfinding_report.txt')
+    
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write("="*70 + "\n")
+        f.write("A* PATHFINDING SIMULATION REPORT\n")
+        f.write("="*70 + "\n\n")
+        
+        # Layout configuration
+        f.write("LAYOUT CONFIGURATION:\n")
+        f.write("-"*70 + "\n")
+        config = results['config']
+        f.write(f"Map Size: {config['width']}m × {config['height']}m\n")
+        f.write(f"Resolution: {config['resolution']} px/meter\n")
+        f.write(f"Number of Rooms: {config['num_rooms']}\n")
+        f.write(f"Number of Exits: {config['num_exits']}\n\n")
+        
+        # Pathfinding results
+        f.write("PATHFINDING RESULTS:\n")
+        f.write("-"*70 + "\n")
+        f.write(f"Total People: {results['num_people']}\n")
+        f.write(f"Successful Paths: {sum(1 for p in results['paths'] if p is not None)}\n")
+        f.write(f"Failed Paths: {sum(1 for p in results['paths'] if p is None)}\n")
+        f.write(f"Success Rate: {results['success_rate']:.1f}%\n\n")
+        
+        # Exit usage statistics
+        f.write("EXIT USAGE STATISTICS:\n")
+        f.write("-"*70 + "\n")
+        for exit_pos, count in results['exit_usage'].items():
+            f.write(f"Exit at {exit_pos}: {count} people\n")
+        f.write("\n")
+        
+        # Detailed path information
+        f.write("DETAILED PATH INFORMATION:\n")
+        f.write("-"*70 + "\n")
+        for i, (start_pos, target_exit, path) in enumerate(zip(
+            results['people_positions'], 
+            results['target_exits'], 
+            results['paths']
+        )):
+            f.write(f"\nPerson {i+1}:\n")
+            f.write(f"  Start Position: {start_pos}\n")
+            f.write(f"  Target Exit: {target_exit}\n")
+            if path:
+                f.write(f"  Path Length: {len(path)} steps\n")
+                f.write(f"  Path Status: ✓ SUCCESS\n")
+            else:
+                f.write(f"  Path Status: ✗ FAILED\n")
+        
+        f.write("\n" + "="*70 + "\n")
+    
+    print(f"Report saved to {report_path}")
+    return report_path
+
+
+def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False):
     """
     Run A* pathfinding simulation on a given layout
     
     Parameters:
     -----------
     layout_dir : str
-        Path to directory containing map data (walkability_map.npy, layout_config.npy, exit_positions.npy)
+        Path to directory containing map data
     num_people : int, optional
         Number of people to simulate (default: 8)
     save_output : bool, optional
-        Whether to save result plot (default: True)
+        Whether to save result plot and report (default: True)
     show_plot : bool, optional
         Whether to display plot (default: True)
     
     Returns:
     --------
     dict : Dictionary containing simulation results
-        - 'paths': List of paths for each person
-        - 'people_positions': Starting positions of people
-        - 'target_exits': Target exit for each person
-        - 'exit_usage': Exit usage statistics
-        - 'success_rate': Percentage of successful paths
     """
     
     print(f"Loading map data from: {layout_dir}")
@@ -265,7 +328,7 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=True):
     width_px = walkability_grid.shape[0]
     walkmap_visual = np.zeros((height_px, width_px, 3), dtype=np.uint8)
     
-    # Fill colors (be careful with axis mapping)
+    # Fill colors
     for i in range(width_px):
         for j in range(height_px):
             if walkability_grid[i][j] == 0:
@@ -331,7 +394,7 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=True):
     print(f"{'='*60}")
     
     # Return results
-    return {
+    results = {
         'paths': paths,
         'people_positions': people_positions,
         'target_exits': target_exits,
@@ -340,7 +403,12 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=True):
         'num_people': num_people,
         'config': config
     }
-
+    
+    # Save report if requested
+    if save_output:
+        save_pathfinding_report(layout_dir, results)
+    
+    return results
 
 # ===== MAIN PROGRAM (for standalone execution) =====
 if __name__ == "__main__":

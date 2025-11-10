@@ -1,10 +1,9 @@
-# office_layout_generator.py - Fixed door depth and folder organization
+# office_layout_generator.py - Fixed output directory (basic_office_map)
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
 import os
-from datetime import datetime
 
 class Room:
     def __init__(self, x, y, width, height, room_type='office'):
@@ -19,6 +18,7 @@ class Room:
     def add_door(self, door):
         """Add a door to this room"""
         self.doors.append(door)
+
 
 def create_office_layout():
     """Create office layout matching the reference image"""
@@ -49,14 +49,13 @@ def create_office_layout():
         rooms.append(room)
         
         # Add door connecting to hallway (bottom of office)
-        # INCREASED DEPTH: door height now 0.4m to fully penetrate wall
         door_x = x + OFFICE_WIDTH / 2 - 0.5
-        door_y = y + OFFICE_HEIGHT_TOP - 0.2  # Start deeper into wall
+        door_y = y + OFFICE_HEIGHT_TOP - 0.2
         doors.append({
             'x': door_x,
             'y': door_y,
             'width': 1,
-            'height': 0.4,  # INCREASED from 0.2 to 0.4
+            'height': 0.4,
             'is_exit': False
         })
     
@@ -73,40 +72,39 @@ def create_office_layout():
         rooms.append(room)
         
         # Add door connecting to hallway (top of office)
-        # INCREASED DEPTH
         door_x = x + OFFICE_WIDTH / 2 - 0.5
-        door_y = y - 0.2  # Start deeper into wall
+        door_y = y - 0.2
         doors.append({
             'x': door_x,
             'y': door_y,
             'width': 1,
-            'height': 0.4,  # INCREASED from 0.2 to 0.4
+            'height': 0.4,
             'is_exit': False
         })
     
     # === Create Two Exits (left and right of hallway) ===
-    # INCREASED EXIT WIDTH for better visibility
     exit_y = HALLWAY_Y + HALLWAY_HEIGHT / 2
     
-    # Left Exit - EXTENDED to fully penetrate wall
+    # Left Exit
     exits.append({
-        'x': -0.2,  # Start outside the wall
+        'x': -0.2,
         'y': exit_y - 0.5,
-        'width': 0.4,  # INCREASED from 0.3 to 0.4
+        'width': 0.4,
         'height': 1,
         'is_exit': True
     })
     
-    # Right Exit - EXTENDED to fully penetrate wall
+    # Right Exit
     exits.append({
-        'x': FLOOR_WIDTH - 0.2,  # Extend outside
+        'x': FLOOR_WIDTH - 0.2,
         'y': exit_y - 0.5,
-        'width': 0.4,  # INCREASED from 0.3 to 0.4
+        'width': 0.4,
         'height': 1,
         'is_exit': True
     })
     
     return rooms, doors, exits, FLOOR_WIDTH, FLOOR_HEIGHT
+
 
 def create_walkability_map(rooms, doors, exits, width, height, resolution=50):
     """Create walkability map: 0=walkable, 1=wall"""
@@ -153,6 +151,7 @@ def create_walkability_map(rooms, doors, exits, width, height, resolution=50):
     
     return grid
 
+
 def visualize_layout(rooms, doors, exits, width, height, output_dir):
     """Visualize the office layout"""
     fig, ax = plt.subplots(figsize=(16, 10))
@@ -171,19 +170,18 @@ def visualize_layout(rooms, doors, exits, width, height, output_dir):
         ax.text(center_x, center_y, label,
                ha='center', va='center', fontsize=14, weight='bold')
     
-    # Draw doors (white rectangles with border) - NOW DEEPER
+    # Draw doors
     for door in doors:
         rect = patches.Rectangle((door['x'], door['y']), door['width'], door['height'],
                                  linewidth=2, edgecolor='#666', facecolor='white')
         ax.add_patch(rect)
     
-    # Draw exits (green) - NOW WIDER
+    # Draw exits (green)
     for exit_d in exits:
         rect = patches.Rectangle((exit_d['x'], exit_d['y']), exit_d['width'], exit_d['height'],
                                  linewidth=3, edgecolor='darkgreen', facecolor='green')
         ax.add_patch(rect)
         
-        # Add EXIT label
         label_x = exit_d['x'] + exit_d['width'] / 2
         label_y = exit_d['y'] + exit_d['height'] / 2
         offset_x = -2 if exit_d['x'] < 1 else 2
@@ -197,7 +195,7 @@ def visualize_layout(rooms, doors, exits, width, height, output_dir):
     ax.set_aspect('equal')
     ax.set_xlabel('Width (m)', fontsize=12, weight='bold')
     ax.set_ylabel('Height (m)', fontsize=12, weight='bold')
-    ax.set_title('Office Building Layout (Doors with Full Wall Penetration)', fontsize=16, weight='bold')
+    ax.set_title('Basic Office Building Layout', fontsize=16, weight='bold')
     ax.grid(True, alpha=0.3, linestyle='--')
     
     plt.tight_layout()
@@ -206,32 +204,37 @@ def visualize_layout(rooms, doors, exits, width, height, output_dir):
     print(f"Office layout saved to {output_path}")
     plt.show()
 
-def save_exit_positions(exits, resolution, output_dir):
-    """Save exit positions for pathfinding - CENTER of each exit"""
+
+def save_exit_positions(exits, resolution, width, height, output_dir):
+    """Save all exit positions with boundary clamping"""
+    max_x = int(width * resolution) - 1
+    max_y = int(height * resolution) - 1
+    
     exit_positions = []
     for exit_d in exits:
-        # Calculate center of exit in pixel coordinates
         center_x = int((exit_d['x'] + exit_d['width'] / 2) * resolution)
         center_y = int((exit_d['y'] + exit_d['height'] / 2) * resolution)
+        
+        # Clamp to valid grid boundaries
+        center_x = max(0, min(center_x, max_x))
+        center_y = max(0, min(center_y, max_y))
+        
         exit_positions.append([center_x, center_y])
     
-    output_path = os.path.join(output_dir, 'exit_positions.npy')
-    np.save(output_path, np.array(exit_positions))
-    print(f"Exit positions saved to {output_path}: {exit_positions}")
+    if exit_positions:
+        filepath = os.path.join(output_dir, 'exit_positions.npy')
+        np.save(filepath, np.array(exit_positions))
+        print(f"Exit positions saved to {filepath}: {exit_positions}")
     return exit_positions
+
 
 # ===== MAIN PROGRAM =====
 if __name__ == "__main__":
-    # Create output directory
-    output_dir = 'basic_office_layouts'
+    # Fixed output directory - no timestamp subdirectories
+    output_dir = 'basic_office_map'
     os.makedirs(output_dir, exist_ok=True)
     
-    # Add timestamp subdirectory for version control
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    session_dir = os.path.join(output_dir, timestamp)
-    os.makedirs(session_dir, exist_ok=True)
-    
-    print(f"Creating office layout in: {session_dir}")
+    print(f"Creating office layout in: {output_dir}")
     print("="*60)
     
     rooms, doors, exits, WIDTH, HEIGHT = create_office_layout()
@@ -242,21 +245,21 @@ if __name__ == "__main__":
     print(f"Generated {office_count} offices + 1 hallway")
     print(f"Floor dimensions: {WIDTH}m × {HEIGHT}m")
     print(f"Number of exits: {len(exits)}")
-    print(f"Door dimensions: 1m × 0.4m (INCREASED for full wall penetration)")
-    print(f"Exit dimensions: 0.4m × 1m (INCREASED for better visibility)")
+    print(f"Door dimensions: 1m × 0.4m")
+    print(f"Exit dimensions: 0.4m × 1m")
     
     # Generate walkability map
     print("\nGenerating walkability map...")
     walkability_grid = create_walkability_map(rooms, doors, exits, WIDTH, HEIGHT, RESOLUTION)
     
     # Save walkability map
-    walkmap_path = os.path.join(session_dir, 'walkability_map.npy')
+    walkmap_path = os.path.join(output_dir, 'walkability_map.npy')
     np.save(walkmap_path, walkability_grid)
     print(f"Walkability map saved to {walkmap_path}")
     print(f"Grid shape: {walkability_grid.shape}")
     
     # Save exit positions
-    save_exit_positions(exits, RESOLUTION, session_dir)
+    save_exit_positions(exits, RESOLUTION, WIDTH, HEIGHT, output_dir)
     
     # Save configuration
     config = {
@@ -268,13 +271,13 @@ if __name__ == "__main__":
         'door_size': '1m × 0.4m',
         'exit_size': '0.4m × 1m'
     }
-    config_path = os.path.join(session_dir, 'layout_config.npy')
+    config_path = os.path.join(output_dir, 'layout_config.npy')
     np.save(config_path, config)
     print(f"Configuration saved to {config_path}")
     
     # Visualize layout
     print("\nVisualizing layout...")
-    visualize_layout(rooms, doors, exits, WIDTH, HEIGHT, session_dir)
+    visualize_layout(rooms, doors, exits, WIDTH, HEIGHT, output_dir)
     
     # Create and save walkability visualization WITH EXITS
     print("\nCreating walkability map visualization...")
@@ -293,7 +296,7 @@ if __name__ == "__main__":
             else:
                 walkmap_visual[j][i] = [0, 0, 0]        # Black = wall
     
-    # Overlay exits in GREEN on walkability map
+    # Overlay exits in GREEN
     for exit_d in exits:
         x1 = max(0, int(exit_d['x'] * RESOLUTION))
         y1 = max(0, int(exit_d['y'] * RESOLUTION))
@@ -315,21 +318,10 @@ if __name__ == "__main__":
     ax.grid(True, alpha=0.3, linestyle='--', color='gray')
     
     plt.tight_layout()
-    walkmap_visual_path = os.path.join(session_dir, 'walkability_map.png')
+    walkmap_visual_path = os.path.join(output_dir, 'walkability_map.png')
     plt.savefig(walkmap_visual_path, dpi=150, bbox_inches='tight')
     print(f"Walkability map visualization saved to {walkmap_visual_path}")
     plt.show()
-    
-    # Create a symlink to latest for easy access
-    latest_link = os.path.join(output_dir, 'latest')
-    if os.path.exists(latest_link):
-        os.remove(latest_link)
-    try:
-        os.symlink(timestamp, latest_link, target_is_directory=True)
-    except OSError:
-        # On Windows, just copy the path to a text file
-        with open(os.path.join(output_dir, 'latest.txt'), 'w') as f:
-            f.write(timestamp)
     
     print(f"\n{'='*60}")
     print("Generation complete!")
@@ -337,9 +329,9 @@ if __name__ == "__main__":
     print(f"  - 3 offices (top row, each 10m × 7.5m)")
     print(f"  - 1 hallway (center, 30m × 5m)")
     print(f"  - 3 offices (bottom row, each 10m × 7.5m)")
-    print(f"  - 6 doors (1m × 0.4m each, FULL wall penetration)")
+    print(f"  - 6 doors (1m × 0.4m each)")
     print(f"  - 2 exits (0.4m × 1m each, left & right)")
-    print(f"\nAll files saved to: {session_dir}")
+    print(f"\nAll files saved to: {output_dir}")
     print(f"Files created:")
     print(f"  - office_layout.png")
     print(f"  - walkability_map.png")
@@ -347,5 +339,3 @@ if __name__ == "__main__":
     print(f"  - exit_positions.npy")
     print(f"  - layout_config.npy")
     print(f"{'='*60}")
-    print(f"\nTo use with pathfinding, copy these files from {session_dir}")
-    print("Or update pathfinding.py to read from this directory!")

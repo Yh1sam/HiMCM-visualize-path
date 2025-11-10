@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-def visualize_simple_office(data_file='simple_office.json'):
+def visualize_map(data_file='map_data.json'):
     """
     Generates and saves a visualization of the simple office layout.
     """
@@ -20,7 +20,7 @@ def visualize_simple_office(data_file='simple_office.json'):
     ax.set_aspect('equal', adjustable='box')
 
     # Define colors and markers
-    room_colors = {'office': 'lightblue', 'corridor': 'lightgrey'}
+    room_colors = {'office': 'lightblue', 'corridor': 'lightgrey', 'meeting_room': 'lightgreen'}
     exit_marker = 'X'
     safety_equipment_markers = {
         'fire_alarm': 'v',
@@ -73,9 +73,9 @@ def visualize_simple_office(data_file='simple_office.json'):
     ax.legend(by_label.values(), by_label.keys(), loc='upper right', bbox_to_anchor=(1.2, 1))
 
     plt.grid(True, linestyle='--', alpha=0.6)
-    plt.savefig('simple_office_layout.png', bbox_inches='tight')
+    plt.savefig('map_layout.png', bbox_inches='tight')
     plt.close(fig)
-    print("Saved visualization to simple_office_layout.png")
+    print("Saved visualization to map_layout.png")
 
 if __name__ == "__main__":
-    visualize_simple_office()
+    visualize_map()

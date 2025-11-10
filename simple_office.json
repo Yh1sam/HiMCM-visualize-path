@@ -1,0 +1,456 @@
+{
+  "name": "Simple Office Floor",
+  "floor_dimensions": [
+    50.0,
+    30.0
+  ],
+  "rooms": [
+    {
+      "id": "CORRIDOR_01",
+      "name": "Main Corridor",
+      "type": "corridor",
+      "position": [
+        0,
+        13.5
+      ],
+      "size": [
+        50.0,
+        3.0
+      ]
+    },
+    {
+      "id": "OFFICE_0",
+      "name": "Office 0",
+      "type": "office",
+      "position": [
+        0.0,
+        16.5
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_1",
+      "name": "Office 1",
+      "type": "office",
+      "position": [
+        0.0,
+        0
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_2",
+      "name": "Office 2",
+      "type": "office",
+      "position": [
+        10.0,
+        16.5
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_3",
+      "name": "Office 3",
+      "type": "office",
+      "position": [
+        10.0,
+        0
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_4",
+      "name": "Office 4",
+      "type": "office",
+      "position": [
+        20.0,
+        16.5
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_5",
+      "name": "Office 5",
+      "type": "office",
+      "position": [
+        20.0,
+        0
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_6",
+      "name": "Office 6",
+      "type": "office",
+      "position": [
+        30.0,
+        16.5
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_7",
+      "name": "Office 7",
+      "type": "office",
+      "position": [
+        30.0,
+        0
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_8",
+      "name": "Office 8",
+      "type": "office",
+      "position": [
+        40.0,
+        16.5
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    },
+    {
+      "id": "OFFICE_9",
+      "name": "Office 9",
+      "type": "office",
+      "position": [
+        40.0,
+        0
+      ],
+      "size": [
+        10.0,
+        13.5
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_OFFICE_0",
+      "room_id": "OFFICE_0",
+      "position": [
+        4.55,
+        16.5
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_1",
+      "room_id": "OFFICE_1",
+      "position": [
+        4.55,
+        13.3
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_2",
+      "room_id": "OFFICE_2",
+      "position": [
+        14.55,
+        16.5
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_3",
+      "room_id": "OFFICE_3",
+      "position": [
+        14.55,
+        13.3
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_4",
+      "room_id": "OFFICE_4",
+      "position": [
+        24.55,
+        16.5
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_5",
+      "room_id": "OFFICE_5",
+      "position": [
+        24.55,
+        13.3
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_6",
+      "room_id": "OFFICE_6",
+      "position": [
+        34.55,
+        16.5
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_7",
+      "room_id": "OFFICE_7",
+      "position": [
+        34.55,
+        13.3
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_8",
+      "room_id": "OFFICE_8",
+      "position": [
+        44.55,
+        16.5
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    },
+    {
+      "id": "DOOR_OFFICE_9",
+      "room_id": "OFFICE_9",
+      "position": [
+        44.55,
+        13.3
+      ],
+      "size": [
+        0.9,
+        0.2
+      ]
+    }
+  ],
+  "exits": [
+    {
+      "id": "EXIT_01",
+      "position": [
+        0,
+        14.4
+      ],
+      "width": 1.2,
+      "type": "main_exit"
+    },
+    {
+      "id": "EXIT_02",
+      "position": [
+        48.8,
+        14.4
+      ],
+      "width": 1.2,
+      "type": "main_exit"
+    }
+  ],
+  "safety_equipment": [
+    {
+      "id": "ALARM_EXIT_01",
+      "type": "fire_alarm",
+      "position": [
+        2.2,
+        14.4
+      ]
+    },
+    {
+      "id": "EXTINGUISHER_EXIT_01",
+      "type": "extinguisher",
+      "position": [
+        2.2,
+        15.4
+      ]
+    },
+    {
+      "id": "EMERG_LIGHT_EXIT_01",
+      "type": "emergency_light",
+      "position": [
+        0.6,
+        15.6
+      ]
+    },
+    {
+      "id": "ALARM_EXIT_02",
+      "type": "fire_alarm",
+      "position": [
+        47.8,
+        14.4
+      ]
+    },
+    {
+      "id": "EXTINGUISHER_EXIT_02",
+      "type": "extinguisher",
+      "position": [
+        47.8,
+        15.4
+      ]
+    },
+    {
+      "id": "EMERG_LIGHT_EXIT_02",
+      "type": "emergency_light",
+      "position": [
+        49.4,
+        15.6
+      ]
+    },
+    {
+      "id": "SMOKE_CORRIDOR_1",
+      "type": "smoke_detector",
+      "position": [
+        10,
+        15.0
+      ]
+    },
+    {
+      "id": "SMOKE_CORRIDOR_2",
+      "type": "smoke_detector",
+      "position": [
+        20,
+        15.0
+      ]
+    },
+    {
+      "id": "SMOKE_CORRIDOR_3",
+      "type": "smoke_detector",
+      "position": [
+        30,
+        15.0
+      ]
+    },
+    {
+      "id": "SMOKE_CORRIDOR_4",
+      "type": "smoke_detector",
+      "position": [
+        40,
+        15.0
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_0",
+      "type": "smoke_detector",
+      "position": [
+        5.0,
+        23.25
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_1",
+      "type": "smoke_detector",
+      "position": [
+        5.0,
+        6.75
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_2",
+      "type": "smoke_detector",
+      "position": [
+        15.0,
+        23.25
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_3",
+      "type": "smoke_detector",
+      "position": [
+        15.0,
+        6.75
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_4",
+      "type": "smoke_detector",
+      "position": [
+        25.0,
+        23.25
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_5",
+      "type": "smoke_detector",
+      "position": [
+        25.0,
+        6.75
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_6",
+      "type": "smoke_detector",
+      "position": [
+        35.0,
+        23.25
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_7",
+      "type": "smoke_detector",
+      "position": [
+        35.0,
+        6.75
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_8",
+      "type": "smoke_detector",
+      "position": [
+        45.0,
+        23.25
+      ]
+    },
+    {
+      "id": "SMOKE_OFFICE_9",
+      "type": "smoke_detector",
+      "position": [
+        45.0,
+        6.75
+      ]
+    }
+  ]
+}

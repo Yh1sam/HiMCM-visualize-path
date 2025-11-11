@@ -4,8 +4,9 @@ A* PATHFINDING SIMULATION REPORT
 
 LAYOUT CONFIGURATION:
 ----------------------------------------------------------------------
-Map Size: 30m × 20m
+Map Size: 30m x 20m
 Resolution: 50 px/meter
+Walking Speed: 1.2 m/s
 Number of Rooms: 6
 Number of Exits: 2
 
@@ -16,6 +17,8 @@ Successful Paths: 8
 Failed Paths: 0
 Success Rate: 100.0%
 
+Total Evacuation Time (max): 19.16 s
+
 EXIT USAGE STATISTICS:
 ----------------------------------------------------------------------
 Exit at (np.int64(0), np.int64(500)): 4 people
@@ -25,51 +28,75 @@ DETAILED PATH INFORMATION:
 ----------------------------------------------------------------------
 
 Person 1:
-  Start Position: (585, 954)
-  Target Exit: (0, 500)
-  Path Length: 1063 steps
-  Path Status: ✓ SUCCESS
+  Start Position: (834, 968)
+  Target Exit: (1499, 500)
+  Path Length: 1077 steps
+  Path Length (m): ~22.99 m
+  Human Steps (~0.7 m): 33
+  Est. Time: 19.16 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 2:
-  Start Position: (11, 23)
+  Start Position: (648, 582)
   Target Exit: (0, 500)
-  Path Length: 585 steps
-  Path Status: ✓ SUCCESS
+  Path Length: 649 steps
+  Path Length (m): ~13.64 m
+  Human Steps (~0.7 m): 19
+  Est. Time: 11.37 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 3:
-  Start Position: (809, 12)
-  Target Exit: (1499, 500)
-  Path Length: 1096 steps
-  Path Status: ✓ SUCCESS
+  Start Position: (124, 104)
+  Target Exit: (0, 500)
+  Path Length: 504 steps
+  Path Length (m): ~11.87 m
+  Human Steps (~0.7 m): 17
+  Est. Time: 9.90 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 4:
-  Start Position: (808, 46)
+  Start Position: (883, 355)
   Target Exit: (1499, 500)
-  Path Length: 1062 steps
-  Path Status: ✓ SUCCESS
+  Path Length: 850 steps
+  Path Length (m): ~18.06 m
+  Human Steps (~0.7 m): 26
+  Est. Time: 15.05 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 5:
-  Start Position: (1146, 819)
+  Start Position: (1080, 742)
   Target Exit: (1499, 500)
-  Path Length: 428 steps
-  Path Status: ✓ SUCCESS
+  Path Length: 420 steps
+  Path Length (m): ~10.38 m
+  Human Steps (~0.7 m): 15
+  Est. Time: 8.65 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 6:
-  Start Position: (345, 792)
+  Start Position: (747, 67)
   Target Exit: (0, 500)
-  Path Length: 401 steps
-  Path Status: ✓ SUCCESS
+  Path Length: 1041 steps
+  Path Length (m): ~21.96 m
+  Human Steps (~0.7 m): 31
+  Est. Time: 18.30 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 7:
-  Start Position: (407, 540)
-  Target Exit: (0, 500)
-  Path Length: 408 steps
-  Path Status: ✓ SUCCESS
+  Start Position: (1053, 151)
+  Target Exit: (1499, 500)
+  Path Length: 457 steps
+  Path Length (m): ~11.93 m
+  Human Steps (~0.7 m): 17
+  Est. Time: 9.94 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 Person 8:
-  Start Position: (762, 403)
-  Target Exit: (1499, 500)
-  Path Length: 738 steps
-  Path Status: ✓ SUCCESS
+  Start Position: (167, 478)
+  Target Exit: (0, 500)
+  Path Length: 168 steps
+  Path Length (m): ~3.52 m
+  Human Steps (~0.7 m): 5
+  Est. Time: 2.94 s @ 1.20 m/s
+  Path Status: OK SUCCESS
 
 ======================================================================

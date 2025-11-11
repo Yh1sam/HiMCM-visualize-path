@@ -1,4 +1,4 @@
-# pathfinding.py - Modular A* Pathfinding Algorithm
+﻿# pathfinding.py - Modular A* Pathfinding Algorithm
 import numpy as np
 import matplotlib.pyplot as plt
 import heapq
@@ -40,6 +40,23 @@ def generate_32_directions():
 
 
 DIRECTIONS_32 = generate_32_directions()
+
+def path_distance_meters(path, resolution):
+    """Sum of segment distances (in meters) along a pixel path."""
+    if not path or len(path) < 2:
+        return 0.0
+    dist_px = 0.0
+    for i in range(1, len(path)):
+        a = path[i - 1]
+        b = path[i]
+        dist_px += math.dist(a, b)
+    return dist_px / resolution  # px -> meters
+
+def scaled_step_count(path, resolution, step_unit_m=0.7):
+    """Scaled steps: how many 'step_unit_m' units the path covers."""
+    dist_m = path_distance_meters(path, resolution)
+    return int(round(dist_m / step_unit_m))
+
 
 
 def is_diagonal_move_valid(grid, current, neighbor):
@@ -204,8 +221,9 @@ def save_pathfinding_report(layout_dir, results):
         f.write("LAYOUT CONFIGURATION:\n")
         f.write("-"*70 + "\n")
         config = results['config']
-        f.write(f"Map Size: {config['width']}m × {config['height']}m\n")
+        f.write(f"Map Size: {config['width']}m x {config['height']}m\n")
         f.write(f"Resolution: {config['resolution']} px/meter\n")
+        f.write(f"Walking Speed: {results.get('speed_mps', 1.2)} m/s\n")
         f.write(f"Number of Rooms: {config['num_rooms']}\n")
         f.write(f"Number of Exits: {config['num_exits']}\n\n")
         
@@ -216,6 +234,10 @@ def save_pathfinding_report(layout_dir, results):
         f.write(f"Successful Paths: {sum(1 for p in results['paths'] if p is not None)}\n")
         f.write(f"Failed Paths: {sum(1 for p in results['paths'] if p is None)}\n")
         f.write(f"Success Rate: {results['success_rate']:.1f}%\n\n")
+        if 'total_evac_time_s' in results:
+            f.write(f"Total Evacuation Time (max): {results['total_evac_time_s']:.2f} s\n\n")
+        else:
+            f.write("\n")
         
         # Exit usage statistics
         f.write("EXIT USAGE STATISTICS:\n")
@@ -237,9 +259,18 @@ def save_pathfinding_report(layout_dir, results):
             f.write(f"  Target Exit: {target_exit}\n")
             if path:
                 f.write(f"  Path Length: {len(path)} steps\n")
-                f.write(f"  Path Status: ✓ SUCCESS\n")
+                dist_m = results.get('distances_m', [None]*len(results['paths']))[i]
+                time_s = results.get('times_s', [None]*len(results['paths']))[i]
+                human_steps = results.get('scaled_steps', [None]*len(results['paths']))[i]
+                if dist_m is not None:
+                    f.write(f"  Path Length (m): ~{dist_m:.2f} m\n")
+                if human_steps is not None:
+                    f.write(f"  Human Steps (~0.7 m): {human_steps}\n")
+                if time_s is not None:
+                    f.write(f"  Est. Time: {time_s:.2f} s @ {results.get('speed_mps', 1.2):.2f} m/s\n")
+                f.write(f"  Path Status: OK SUCCESS\n")
             else:
-                f.write(f"  Path Status: ✗ FAILED\n")
+                f.write(f"  Path Status: X FAILED\n")
         
         f.write("\n" + "="*70 + "\n")
     
@@ -247,7 +278,7 @@ def save_pathfinding_report(layout_dir, results):
     return report_path
 
 
-def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False):
+def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False, speed_mps=1.2, step_unit_m=0.7):
     """
     Run A* pathfinding simulation on a given layout
     
@@ -280,7 +311,7 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False)
     HEIGHT = config['height']
     RESOLUTION = config['resolution']
     
-    print(f"Map size: {WIDTH}m × {HEIGHT}m")
+    print(f"Map size: {WIDTH}m x {HEIGHT}m")
     print(f"Grid size: {walkability_grid.shape}")
     print(f"Resolution: {RESOLUTION} px/meter")
     print(f"Number of exits: {len(exits)}")
@@ -289,24 +320,36 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False)
     print(f"\nGenerating {num_people} random people positions...")
     people_positions = find_random_walkable_positions(walkability_grid, num_people)
     
-    # Find paths—each person heads to their nearest exit
+    # Find paths?ach person heads to their nearest exit
     paths = []
     target_exits = []
+    distances_m = []
+    times_s = []
+    scaled_steps_list = []
     
     print("\nPathfinding (each person chooses their nearest exit)...")
     for i, start_pos in enumerate(people_positions):
         nearest_exit = find_nearest_exit(start_pos, exits)
         target_exits.append(nearest_exit)
         
-        print(f"Person {i+1}/{num_people}: start {start_pos} → target exit {nearest_exit}")
+        print(f"Person {i+1}/{num_people}: start {start_pos} -> target exit {nearest_exit}")
         
         path = a_star_search(walkability_grid, start_pos, nearest_exit)
         if path:
             paths.append(path)
-            print(f"  ✓ Path found, length: {len(path)} steps")
+            dist_m = path_distance_meters(path, RESOLUTION)
+            human_steps = scaled_step_count(path, RESOLUTION, step_unit_m)
+            time_s = dist_m / speed_mps if speed_mps > 0 else float('inf')
+            distances_m.append(dist_m)
+            times_s.append(time_s)
+            scaled_steps_list.append(human_steps)
+            print(f"  Path found: ~{dist_m:.1f} m, ~{human_steps} human-steps (0.7 m), est time: {time_s:.1f} s")
         else:
             paths.append(None)
-            print(f"  ✗ No path found")
+            distances_m.append(None)
+            times_s.append(None)
+            scaled_steps_list.append(None)
+            print(f"  X No path found")
     
     # Exit usage stats
     exit_usage = {}
@@ -385,7 +428,14 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False)
     # Calculate success rate
     successful_paths = sum(1 for p in paths if p is not None)
     success_rate = (successful_paths / num_people) * 100 if num_people > 0 else 0
+    valid_times = [t for t in times_s if t is not None]
+    total_evac_time_s = max(valid_times) if valid_times else 0.0
     
+    if len(valid_times) > 0:
+        print("\nEvacuation time summary:")
+
+        print(f"  Avg time: {sum(valid_times)/len(valid_times):.1f} s")
+        print(f"  Max (total) time: {total_evac_time_s:.1f} s")
     print(f"\n{'='*60}")
     print(f"Pathfinding complete!")
     print(f"Paths found: {successful_paths}/{num_people} ({success_rate:.1f}%)")
@@ -401,7 +451,12 @@ def run_pathfinding(layout_dir, num_people=8, save_output=True, show_plot=False)
         'exit_usage': exit_usage,
         'success_rate': success_rate,
         'num_people': num_people,
-        'config': config
+        'config': config,
+        'speed_mps': speed_mps,
+        'distances_m': distances_m,
+        'times_s': times_s,
+        'scaled_steps': scaled_steps_list,
+        'total_evac_time_s': total_evac_time_s
     }
     
     # Save report if requested
@@ -446,3 +501,4 @@ if __name__ == "__main__":
     
     if results:
         print("\nSimulation completed successfully!")
+
